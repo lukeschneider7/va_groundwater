@@ -11,7 +11,7 @@ Recently I read a New York Times article on land subsidence in the tidewater reg
 This project scrapes groundwater data from the USGS website for Virginia counties. It utilizes the requests library to fetch the HTML content, which is then parsed using BeautifulSoup. Key data extracted includes jurisdiction names, station numbers, dates, site names, and water table depths. The cleaned data is stored in a pandas DataFrame and exported to a CSV file. This data was then merged with a virginia fips/county dataset to make a choropleth to vizualize water table depths and station counts by counties.
 
 ## Results
-[Jupyter notebook results](https://lukeschneider7.github.io/va_groundwater/va_groundwater_scraper.html)
+[Jupyter notebook results](https://lukeschneider7.github.io/va_groundwater/va_groundwater_scraper.ipynb)
 
 ## Future Work
 5. **Automate retrieval of USGS water Data** 
