@@ -1,5 +1,3 @@
-## va_groundwater_purpose
-
 ## half_marathons_scraper bakground
 
 Recently I read a New York Times article on land subsidence in the tidewater region of Virginia and the related over pumping of the Potomac Aquifer. As a Virginia resident this got me thinking about how groundwater sources are monitored in the state I call home.
