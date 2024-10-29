@@ -83,7 +83,7 @@ st.plotly_chart(fig)
 fig, ax = plt.subplots()
 sns.histplot(merged_with_stats['water table depth'], bins=9, ax=ax)
 ax.set_xlabel('Water Table Depth (ft)')
-ax.set_ylabel('Frequency')
+ax.set_ylabel('Number of Stations')
 ax.set_title('VA Water Table Depths at USGS Monitoring Locations')
 # Display plot in Streamlit
 st.pyplot(fig)
