@@ -12,6 +12,8 @@ r = requests.get('https://httpbin.org/user-agent')
 useragent = json.loads(r.text)['user-agent']
 headers = {'User-Agent': 'data science passion project (vrd9sd@virginia.edu) (Language=Python 3.8.2; platform=Mac OSX 13.0.1'}
 
+st.title('Analyzing USGS Groundwater Data by State')
+st.markdown('### See groundwater data for your state')
 st.text_input("Your State (ex. va)", key="state")
 state = st.session_state.state
 
