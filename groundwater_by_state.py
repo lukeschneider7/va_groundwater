@@ -29,6 +29,9 @@ if state and abv:
     # Parsing HTML code 
     mysoup = BeautifulSoup(r.text, 'html.parser')
 
+    fips = pd.read_csv('minoritymajority.csv')
+    fips['FIPS'] = fips['FIPS'].astype(str).str.zfill(5)
+    fips_filtered = fips[fips['STNAME'] == state]
 
     # make empty list of counties
     counties=[]
@@ -114,13 +117,9 @@ if state and abv:
         st.write(f"All USGS groundwater monitoring sites for {state}")
         groundwater_data
 
-    fips = pd.read_csv('minoritymajority.csv')
-    fips['FIPS'] = fips['FIPS'].astype(str).str.zfill(5)
-    fips_filtered = fips[fips['STNAME'] == state]
-    fips_groundwater = pd.merge(fips_filtered, merged_with_stats, left_on='CTYNAME', right_on='Jurisdiction', how='inner')
-    # fips_groundwater 
-
     if tab == "Map":
+        fips_groundwater = pd.merge(fips_filtered, merged_with_stats, left_on='CTYNAME', right_on='Jurisdiction', how='inner')
+        # fips_groundwater 
         geojson_url = "https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json"
         # Create choropleth map
         fig = px.choropleth(
