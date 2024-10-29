@@ -20,6 +20,7 @@ state = st.session_state.state
 # Url to get HTML from 
 url = f"https://waterdata.usgs.gov/{state}/nwis/current/?type=gw"
 r = requests.get(url, headers=headers)
+url
 
 # Parsing HTML code 
 mysoup = BeautifulSoup(r.text, 'html.parser')
@@ -39,11 +40,12 @@ for td in mysoup.find_all('td'):
 station_number = [x.string for x in mysoup.find_all(lambda tag: tag.has_attr('href') and tag['href'].startswith(f'/{state}/nwis/uv'))]
 
 date_and_site = [x.string for x in mysoup.find_all('td', attrs = {'nowrap':'nowrap'})]
-dates = [item[1:-1] for i, item in enumerate(date_and_site) if i%2==1]
 site_name = [item[1:-1] for i, item in enumerate(date_and_site) if i%2==0]
+dates = [item[1:-1] for i, item in enumerate(date_and_site) if i%2==1]
 
 water_depth_strings = [x.find_all('td')[3].string for x in mysoup.find_all('tr', attrs = {'align':'right'})]
-water_depths = [item[:-1] if item != None else np.nan for item in water_depth_strings]
+water_depths = [item[:-1] if item != None and item != '--' else np.nan for item in water_depth_strings]
+
 
 groundwater_data = pd.DataFrame({
     'Jurisdiction': counties,
@@ -51,7 +53,8 @@ groundwater_data = pd.DataFrame({
     'dates': dates,
     'site_name': site_name,
     'water table depth': water_depths})
-groundwater_data['water table depth'] = groundwater_data['water table depth'].replace({',': ''}, regex=True).astype(float)
+groundwater_data['water table depth'] = groundwater_data['water table depth'].replace({',': '',
+                                                                                       '--': None}, regex=True).astype(float)
 
 grouped = groundwater_data.groupby('Jurisdiction').agg(
     mean_county_depth=('water table depth', 'mean'),
