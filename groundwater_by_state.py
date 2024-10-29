@@ -49,9 +49,7 @@ groundwater_data = pd.DataFrame({
     'dates': dates,
     'site_name': site_name,
     'water table depth': water_depths})
-
 groundwater_data['water table depth'] = groundwater_data['water table depth'].astype('float')
-groundwater_data
 
 grouped = groundwater_data.groupby('Jurisdiction').agg(
     mean_county_depth=('water table depth', 'mean'),
@@ -62,14 +60,6 @@ grouped = groundwater_data.groupby('Jurisdiction').agg(
     q25_county_depth = ('water table depth', lambda x: np.percentile(x, 75)),
     q75_county_depth = ('water table depth', lambda x: np.percentile(x, 75)),
     ).reset_index()
-
-st.write(f"County Depths for {state}")
-depths = grouped.sort_values(by='mean_county_depth', ascending=False)
-depths
-st.write(f"County station counts for {state}")
-num_station = grouped.sort_values(by='num_county_stations', ascending=False)
-num_station
-
 merged_with_stats = pd.merge(groundwater_data, grouped, on='Jurisdiction', how='left')
 
 fig = px.scatter(
@@ -88,17 +78,21 @@ fig.update_xaxes(autorange="reversed")
 # Display Plotly figure in Streamlit
 st.plotly_chart(fig)
 
-fig = px.scatter(
-    grouped,
-    y='median_county_depth',
-    x='num_county_stations',
-    color='Jurisdiction',
-    hover_name='Jurisdiction',  # Shows county name on hover
-    labels={
-        'median_county_depth': 'Median Water Table Depth (ft)',
-        'num_county_stations': 'Number of Stations'
-    },
-    title='Median Water Table Depth vs. Number of Stations by County'
-)
-# Display Plotly figure in Streamlit
-st.plotly_chart(fig)
+fig, ax = plt.subplots()
+sns.histplot(merged_with_stats['water table depth'], bins=9, ax=ax)
+ax.set_xlabel('Water Table Depth (ft)')
+ax.set_ylabel('Frequency')
+ax.set_title('VA Water Table Depths at USGS Monitoring Locations')
+# Display plot in Streamlit
+st.pyplot(fig)
+
+st.write(f"Mean groundwater Depths by county for {state}")
+depths = grouped.sort_values(by='mean_county_depth', ascending=False)
+depths
+
+st.write(f"Number of USGS groundwater monitoring stations by county for {state}")
+num_station = grouped.sort_values(by='num_county_stations', ascending=False)
+num_station
+
+st.write(f"All USGS groundwater monitoring sites for {state}")
+groundwater_data
