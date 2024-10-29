@@ -51,7 +51,7 @@ groundwater_data = pd.DataFrame({
     'dates': dates,
     'site_name': site_name,
     'water table depth': water_depths})
-groundwater_data['water table depth'] = groundwater_data['water table depth'].astype('float')
+groundwater_data['water table depth'] = groundwater_data['water table depth'].replace({',': ''}, regex=True).astype(float)
 
 grouped = groundwater_data.groupby('Jurisdiction').agg(
     mean_county_depth=('water table depth', 'mean'),
