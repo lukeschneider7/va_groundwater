@@ -4,6 +4,6 @@ pandas
 requests
 beautifulsoup4
 matplotlib
-seab
+seaborn
 matplotlib
 plotly
