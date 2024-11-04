@@ -8,6 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.figure_factory as ff
+import state_abbreviations
 
 
 r = requests.get('https://httpbin.org/user-agent')
@@ -16,11 +17,11 @@ headers = {'User-Agent': 'data science passion project (vrd9sd@virginia.edu) (La
 
 
 st.title('Analyzing USGS Groundwater Data by State')
-st.markdown('### See groundwater data for your state')
-st.text_input("Your State (ex. Virginia)", key="state")
-st.text_input("Your County (ex. va)", key="abv")
-state = st.session_state.state
-abv = st.session_state.abv
+abv = st.selectbox(
+    'What state do you want to see data for?',
+    (state_abbreviations.abbreviation_to_name.keys()))
+state = state_abbreviations.abbreviation_to_name[abv]
+abv = abv.lower()
 
 if state and abv:
     # Url to get HTML from 
@@ -110,7 +111,7 @@ if state and abv:
     
     elif tab == "Tables":
         # st.header("Tables")
-        st.write(f"Number of USGS groundwater monitoring stations by county for {state}")
+        st.write(f"USGS groundwater monitoring by county for {state}")
         num_station = grouped.sort_values(by='num_county_stations', ascending=False)
         num_station
 
@@ -129,13 +130,13 @@ if state and abv:
             color='mean_county_depth',
             color_continuous_scale=px.colors.sequential.PuBu[::-1],
             scope='usa',  # Limits map to the United States
-            labels={'values': 'mean water depth by county'}
+            labels={'values': 'mean water depth across stations by county'}
         )
 
         fig.update_geos(fitbounds="locations", visible=False)
         fig.update_layout(
-            title_text='Mean Water Table Depth by County',
-            title_x=0.5
+            title_text=f"{state} Mean Water Table Depth by County",
+            title_x=0
         )
         st.plotly_chart(fig)
 
@@ -146,13 +147,14 @@ if state and abv:
             color='num_county_stations',
             color_continuous_scale=px.colors.sequential.Greys,
             scope='usa',  # Limits map to the United States
-            labels={'values': '# groundwater monitoring stations by county'}
+            labels={'values': '# groundwater monitoring stations by county',
+                    'Jurisdiction': 'Jurisdiction'}
         )
 
         fig2.update_geos(fitbounds="locations", visible=False)
-        fig.update_layout(
-            title_text='USGS groundwater Monitoring station by County',
-            title_x=0.5
+        fig2.update_layout(
+            title_text=f"{state} USGS groundwater Monitoring stations by County",
+            title_x=0
         )
         st.plotly_chart(fig2)
    
