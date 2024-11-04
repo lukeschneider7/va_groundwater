@@ -95,7 +95,7 @@ if state and abv:
                 'median_county_depth': 'Median Water Table Depth (ft)',
                 'num_county_stations': 'Number of Stations'
             },
-            title='Median Water Table Depth vs. Number of Stations by County'
+            title=f'{state} USGS Monitoring Stations by County Median Water Table Depth'
         )
         fig.update_xaxes(autorange="reversed")
         # Display Plotly figure in Streamlit
@@ -105,13 +105,13 @@ if state and abv:
         sns.histplot(merged_with_stats['water table depth'], bins=9, ax=ax)
         ax.set_xlabel('Water Table Depth (ft)')
         ax.set_ylabel('Number of monitorin Stations')
-        ax.set_title('VA Water Table Depths at USGS Monitoring Locations')
+        ax.set_title(f'{state} Water Table Depths at USGS Monitoring Locations')
         # Display plot in Streamlit
         st.pyplot(fig)
     
     elif tab == "Tables":
         # st.header("Tables")
-        st.write(f"USGS groundwater monitoring by county for {state}")
+        st.write(f"USGS groundwater monitoring stats by county for {state} (ft)")
         num_station = grouped.sort_values(by='num_county_stations', ascending=False)
         num_station
 
