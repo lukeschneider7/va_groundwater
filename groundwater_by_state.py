@@ -10,7 +10,7 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import state_abbreviations
 
-
+# User header for scraping
 r = requests.get('https://httpbin.org/user-agent')
 useragent = json.loads(r.text)['user-agent']
 headers = {'User-Agent': 'data science passion project (vrd9sd@virginia.edu) (Language=Python 3.8.2; platform=Mac OSX 13.0.1'}
@@ -22,6 +22,7 @@ abv = st.selectbox(
     (state_abbreviations.abbreviation_to_name.keys()))
 state = state_abbreviations.abbreviation_to_name[abv]
 abv = abv.lower()
+
 
 if state and abv:
     # Url to get HTML from 
@@ -58,6 +59,7 @@ if state and abv:
     counties = [x.replace('And', 'and') for x in counties] # uncapitalize 'And' for places
     counties = [x[:-4] + 'city' if x.endswith('City') else x for x in counties] # uncapitalize 'City' in places
 
+
     # Create a DataFrame of scraped information
     groundwater_data = pd.DataFrame({
         'Jurisdiction': counties,
@@ -80,11 +82,35 @@ if state and abv:
         ).reset_index()
     merged_with_stats = pd.merge(groundwater_data, grouped, on='Jurisdiction', how='left')
 
-    # User Options for Output
+    # User Options for Output Tab
     tab = st.sidebar.selectbox("Choose Output", ["Plots", "Tables", "Map"])
 
+
     if tab == "Plots":
-        # st.header("Charts")
+        fig2=px.scatter(
+            merged_with_stats,
+            x='median_county_depth',
+            y='water table depth',
+            color='Jurisdiction',
+            hover_name='site_name',
+            hover_data={'num_county_stations': True}, # Shows number of stations on hover
+            labels={
+                'median_county_depth': 'Median County Water Table Depth (ft)',
+                'water table depth': 'Water Table Depth (ft)',
+                'num_county_stations':  'Number of Stations',
+                'Jurisdiction': 'County'},
+            title=f'{state} USGS Monitoring Stations Water Table Depth by County'
+        )
+        st.plotly_chart(fig2) # Display Plotly figure in Streamlit
+
+        fig, ax = plt.subplots()
+        sns.histplot(merged_with_stats['water table depth'], bins=9, ax=ax)
+        ax.set_xlabel('Water Table Depth (ft)')
+        ax.set_ylabel('Number of monitoring Stations')
+        ax.set_title(f'{state} Water Table Depths at USGS Monitoring Locations')
+        # Display plot in Streamlit
+        st.pyplot(fig)
+
         fig = px.scatter(
             grouped,
             x='median_county_depth',
@@ -93,22 +119,12 @@ if state and abv:
             hover_name='Jurisdiction',  # Shows county name on hover
             labels={
                 'median_county_depth': 'Median Water Table Depth (ft)',
-                'num_county_stations': 'Number of Stations'
-            },
+                'num_county_stations': 'Number of Stations'},
             title=f'{state} USGS Monitoring Stations by County Median Water Table Depth'
-        )
-        fig.update_xaxes(autorange="reversed")
-        # Display Plotly figure in Streamlit
-        st.plotly_chart(fig)
+        ) # fig.update_xaxes(autorange="reversed")
+        st.plotly_chart(fig) # Display Plotly figure in Streamlit
+          
 
-        fig, ax = plt.subplots()
-        sns.histplot(merged_with_stats['water table depth'], bins=9, ax=ax)
-        ax.set_xlabel('Water Table Depth (ft)')
-        ax.set_ylabel('Number of monitorin Stations')
-        ax.set_title(f'{state} Water Table Depths at USGS Monitoring Locations')
-        # Display plot in Streamlit
-        st.pyplot(fig)
-    
     elif tab == "Tables":
         # st.header("Tables")
         st.write(f"USGS groundwater monitoring stats by county for {state} (ft)")
@@ -132,7 +148,6 @@ if state and abv:
             scope='usa',  # Limits map to the United States
             labels={'values': 'mean water depth across stations by county'}
         )
-
         fig.update_geos(fitbounds="locations", visible=False)
         fig.update_layout(
             title_text=f"{state} Mean Water Table Depth by County",
@@ -150,7 +165,6 @@ if state and abv:
             labels={'values': '# groundwater monitoring stations by county',
                     'Jurisdiction': 'Jurisdiction'}
         )
-
         fig2.update_geos(fitbounds="locations", visible=False)
         fig2.update_layout(
             title_text=f"{state} USGS groundwater Monitoring stations by County",
